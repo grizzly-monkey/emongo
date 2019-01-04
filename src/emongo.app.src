@@ -1,0 +1,22 @@
+{application, emongo,
+ [
+  {description, "Erlang wrapper to mongo using mongocxx"},
+  {vsn, "1.0.0"},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, [
+        {pools, [
+            {master, [
+                {size, 1},
+                {max_overflow, 1}
+            ], [
+                {hostname, "P48TestAB"},
+                {database, "oper"},
+                {username, "test"},
+                {password, "123456"}
+            ]}
+        ]}
+    ]}
+ ]}.

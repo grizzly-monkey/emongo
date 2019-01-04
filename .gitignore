@@ -1,3 +1,4 @@
+_build/
 .eunit
 deps
 *.o
@@ -8,3 +9,18 @@ ebin/*.beam
 rel/example_project
 .concrete/DEV_MODE
 .rebar
+.idea/
+*.iml
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
