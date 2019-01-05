@@ -1,4 +1,29 @@
+%%%----------------------------------------------------------------------
+%%% File    : emongo_nif.erl
+%%% @author : Jeet Parmar <jeet@glabbr.com>
+%%% Purpose : Emongo nif bindings.
+%%% Created : 15 Dec 2018 by Jeet Parmar <jeet@glabbr.com>
+%%%
+%%% Copyright (C) 2002-2019 Glabbr India Pvt. Ltd. All Rights Reserved.
+%%%
+%%% Licensed under the GNU GPL License, Version 3.0 (the "License");
+%%% you may not use this file except in compliance with the License.
+%%% You may obtain a copy of the License at
+%%%
+%%%     https://www.gnu.org/licenses/gpl-3.0.en.html
+%%%
+%%% Unless required by applicable law or agreed to in writing, software
+%%% distributed under the License is distributed on an "AS IS" BASIS,
+%%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%% See the License for the specific language governing permissions and
+%%% limitations under the License.
+%%%
+%%%----------------------------------------------------------------------
+
 -module(emongo_nif).
+
+-author('jeet@glabbr.com').
+
 -export([init/0, connect/2, connect/1,
   find_all/2,
   find_all/4,
@@ -18,7 +43,7 @@
 
 
 init() ->
-  case code:which(emongo) of
+  case code:which(emongo_app) of
     Filename when is_list(Filename) ->
       erlang:load_nif(filename:join([filename:dirname(Filename),
         "..", "priv",

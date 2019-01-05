@@ -1,22 +1,41 @@
+%%%----------------------------------------------------------------------
+%%% File    : emongo.app.src
+%%% Author  : Jeet Parmar <jeet@glabbr.com>
+%%% Purpose : Application package description
+%%% Created : 15 Dec 2018 by Jeet Parmar <jeet@glabbr.com>
+%%%
+%%% Copyright (C) 2002-2019 Glabbr India Pvt. Ltd. All Rights Reserved.
+%%%
+%%% Licensed under the GNU GPL License, Version 3.0 (the "License");
+%%% you may not use this file except in compliance with the License.
+%%% You may obtain a copy of the License at
+%%%
+%%%     https://www.gnu.org/licenses/gpl-3.0.en.html
+%%%
+%%% Unless required by applicable law or agreed to in writing, software
+%%% distributed under the License is distributed on an "AS IS" BASIS,
+%%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%% See the License for the specific language governing permissions and
+%%% limitations under the License.
+%%%
+%%%----------------------------------------------------------------------
+
 {application, emongo,
- [
-  {description, "Erlang wrapper to mongo using mongocxx"},
-  {vsn, "1.0.0"},
-  {applications, [
-                  kernel,
-                  stdlib
-                 ]},
-  {env, [
-        {pools, [
-            {master, [
-                {size, 1},
-                {max_overflow, 1}
-            ], [
-                {hostname, "P48TestAB"},
-                {database, "oper"},
-                {username, "test"},
-                {password, "123456"}
-            ]}
-        ]}
-    ]}
- ]}.
+  [
+    {description, "Mulit Tenant MongoDB driver for Erlang"},
+    {vsn, "1.0.0"},
+    {modules, []},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {mod, {emongo_app, []}},
+
+    %% hex.pm packaging:
+    {files, ["src/", "c_src/emongo.cpp", "c_src/emongo.h",
+      "c_src/mongo_api.cpp", "c_src/mongo_api.h", "c_src/mongo_connection.cpp",
+      "mongo_connection.h", "mongo_exception.h", "mongo_response.h",
+      "rebar.config", "rebar.config.script", "README.md", "LICENSE.txt"]},
+
+    {licenses, ["GNU GPL 3.0"]},
+    {maintainers, ["Glabbr India Pvt. Ltd. (Jeet Parmar <jeet@glabbr.com>)"]},
+    {links, [{"Github", "https://github.com/grizzly-monkey/emongo"}]}
+  ]}.

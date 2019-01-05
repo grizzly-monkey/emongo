@@ -1,70 +1,41 @@
+%%%----------------------------------------------------------------------
+%%% File    : emongo_app.erl
+%%% @author : Jeet Parmar <jeet@glabbr.com>
+%%% Purpose : Emongo APIs
+%%% Created : 15 Dec 2018 by Jeet Parmar <jeet@glabbr.com>
+%%%
+%%% Copyright (C) 2002-2019 Glabbr India Pvt. Ltd. All Rights Reserved.
+%%%
+%%% Licensed under the GNU GPL License, Version 3.0 (the "License");
+%%% you may not use this file except in compliance with the License.
+%%% You may obtain a copy of the License at
+%%%
+%%%     https://www.gnu.org/licenses/gpl-3.0.en.html
+%%%
+%%% Unless required by applicable law or agreed to in writing, software
+%%% distributed under the License is distributed on an "AS IS" BASIS,
+%%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%% See the License for the specific language governing permissions and
+%%% limitations under the License.
+%%%
+%%%----------------------------------------------------------------------
+
+
 -module(emongo).
 
--behaviour(application).
--behaviour(supervisor).
-
-%% Application callbacks
--export([start/1, start/2, stop/0, stop/1, init/1]).
+-author('jeet@glabbr.com').
 
 %% API
--export([find_all/2, execQuery/2, execQueryWithArgs/3, execCallProc/3, exec/3]).
+-export([start_tenant/2, find_all/2]).
 
-%% ===================================================================
-%% Application callbacks
-%% ===================================================================
-
-start(Args) ->
-  application:start(?MODULE),
-  start(normal, Args).
-
-stop() ->
-  stop([]).
-
-start(_StartType, _Args) ->
-  emongo_nif:init(),
-  supervisor:start_link({local, ?MODULE}, ?MODULE, []).
-
-stop(_State) ->
-  application:stop(?MODULE),
-  ok.
-
-
-init([]) ->
-  {ok, Pools} = application:get_env(emongo, pools),
-  PoolSpecs = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
-    PoolArgs = [{name, {local, Name}},
-      {worker_module, emongo_worker}] ++ SizeArgs,
-    poolboy:child_spec(Name, PoolArgs, WorkerArgs)
-                        end, Pools),
-  {ok, {{one_for_all, 2, 2}, PoolSpecs}}.
 
 %%%===================================================================
 %%% API functions
 %%%===================================================================
+start_tenant(TenantId, Uri) ->
+  emongo_sup:start_child(TenantId,Uri).
 
 find_all(PoolName, Collection) ->
   poolboy:transaction(PoolName, fun(Worker) ->
     gen_server:call(Worker, {find_all, Collection})
-                                end).
-
-execQuery(PoolName, Sql) ->
-  poolboy:transaction(PoolName, fun(Worker) ->
-    gen_server:call(Worker, {plain_sql, Sql})
-                                end).
-
-execQueryWithArgs(PoolName, Sql, Args) ->
-  poolboy:transaction(PoolName, fun(Worker) ->
-    gen_server:call(Worker, {args_query, Sql, Args})
-                                end).
-
-exec(PoolName, Sql, Args) ->
-  poolboy:transaction(PoolName, fun(Worker) ->
-    {ok, Stmt} = gen_server:call(Worker, {prepare_sql, Sql}),
-    gen_server:call(Worker, {bind_params, Stmt, Args}),
-    gen_server:call(Worker, {fetchmany, 100})
-                                end).
-
-execCallProc(PoolName, Sql, Args) ->
-  poolboy:transaction(PoolName, fun(Worker) ->
-    gen_server:call(Worker, {call_proc_no_args, Sql, Args})
-                                end).
+                                end, infinity).
