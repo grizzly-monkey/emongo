@@ -5,6 +5,7 @@
 #include "mongocxx/exception/bulk_write_exception.hpp"
 #include "mongocxx/exception/logic_error.hpp"
 #include "mongocxx/exception/write_exception.hpp"
+#include "bsoncxx/exception/exception.hpp"
 
 #define  MONGOCATCH(function, line)     catch(mongocxx::query_exception er)\
     {\

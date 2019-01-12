@@ -27,7 +27,7 @@
 -behaviour(application).
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/2, ensure_started/1, stop/1]).
 
 %% ===================================================================
 %% Application callbacks
@@ -49,10 +49,19 @@
 %%      StartArgs = term()
 %% @end
 %%--------------------------------------------------------------------
+
+-spec start(term(), list()) -> {ok, pid()} | {ok, pid(), any()} | {error, any()}.
 start(_StartType, StartArgs) ->
   emongo_nif:init(),
   emongo_sup:start_link(StartArgs).
 
+-spec ensure_started(string()) -> ok | {error, term()}.
+ensure_started(URI) ->
+  case emongo_sup:start_link([{uri, URI}]) of
+    {ok, _} -> ok;
+    {error, {already_started, _}} -> ok;
+    {error, _} = Err -> Err
+  end.
 
 %%--------------------------------------------------------------------
 %% @private

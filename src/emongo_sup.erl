@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------
 %%% File    : emongo_sup.erl
 %%% @author  : Jeet Parmar <jeet@glabbr.com>
-%%% Purpose : Emongo Supervisor for workers
+%%% Purpose : Emongo Supervisor for emongo workers
 %%% Created : 15 Dec 2018 by Jeet Parmar <jeet@glabbr.com>
 %%%
 %%% Copyright (C) 2002-2019 Glabbr India Pvt. Ltd. All Rights Reserved.

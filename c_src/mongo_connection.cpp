@@ -29,7 +29,7 @@ mongo_response mongo_connection::connect(const char *conn_str) {
         }
         db = uri.database();
         mongo_conn_pool = new mongocxx::pool{uri};
-        return mongo_response{false, "connected"};
+        return mongo_response{false, "Connected"};
     }
     MONGOCATCH(__FUNCTION__, __LINE__);
 }
