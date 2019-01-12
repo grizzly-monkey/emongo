@@ -21,7 +21,14 @@ Design principle
 Usage
 =========
 
-0.Run erlang <br>
+Compile emongo
+```
+./rebar get-deps
+./rebar compile
+
+```
+
+Run erlang <br>
 <code>erl -pa ebin  deps/poolboy/ebin</code>
 
 ```erl
