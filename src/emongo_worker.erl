@@ -38,7 +38,7 @@
 start_link(Args) ->
   gen_server:start_link(?MODULE, Args, []).
 
-init(Args) ->
+init(Args) when length(Args) > 0 ->
   process_flag(trap_exit, true),
   Uri = get_arg(uri, Args),
   TenantId = get_arg(tenant_id, Args),
@@ -47,9 +47,75 @@ init(Args) ->
       {ok, #state{id = TenantId, conn = Conn}};
     {error, Error} ->
       {error, Error}
-  end.
+  end;
+
+init(_Args) ->
+  {error, "Illegal arguments passed , needs URI as param"}.
+
 handle_call({find_all, Collection}, _From, #state{conn = Conn} = State) ->
   {reply, emongo_nif:find_all(Conn, Collection), State};
+handle_call({find_all, Collection, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:find_all(Conn, Collection, Opts), State};
+
+handle_call({find_by_id, Collection, Id}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:find_by_id(Conn, Collection, Id), State};
+
+handle_call({find, Collection, Filter}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:find(Conn, Collection, Filter), State};
+handle_call({find, Collection, Filter, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:find(Conn, Collection, Filter, Opts), State};
+
+handle_call({exists, Collection, Filter}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:exists(Conn, Collection, Filter), State};
+
+handle_call({count, DbName, Collection, Filter}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:count(Conn, DbName, Collection, Filter), State};
+handle_call({count, DbName, Collection, Filter, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:count(Conn, DbName, Collection, Filter, Opts), State};
+
+handle_call({insert, Collection, LenJsonData, JsonData}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:insert(Conn, Collection, LenJsonData, JsonData), State};
+handle_call({insert, Collection, LenJsonData, JsonData, Opts}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:insert(Conn, Collection, LenJsonData, JsonData, Opts), State};
+
+handle_call({update_by_id, Collection, Id, LenJsonData, JsonData}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:update_by_id(Conn, Collection, Id, LenJsonData, JsonData), State};
+handle_call({update_by_id, Collection, Id, LenJsonData, JsonData, Opts}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:update_by_id(Conn, Collection, Id, LenJsonData, JsonData, Opts), State};
+
+handle_call({update_by_query, Collection, LenFilter, Filter, LenJsonData, JsonData}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:update_by_query(Conn, Collection, LenFilter, Filter, LenJsonData, JsonData),
+    State};
+handle_call({update_by_query, Collection, LenFilter, Filter, LenJsonData, JsonData, Opts}, _From,
+    #state{conn = Conn} = State) ->
+  {reply, emongo_nif:update_by_query(Conn, Collection, LenFilter, Filter, LenJsonData, JsonData,
+    Opts), State};
+
+handle_call({delete_by_id, Collection, Id}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:delete_by_id(Conn, Collection, Id), State};
+handle_call({delete_by_id, Collection, Id, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:delete_by_id(Conn, Collection, Id, Opts), State};
+
+handle_call({delete_by_query, Collection, LenFilter, Filter}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:delete_by_query(Conn, Collection, LenFilter, Filter), State};
+handle_call({delete_by_query, Collection, LenFilter, Filter, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:delete_by_query(Conn, Collection, LenFilter, Filter, Opts), State};
+
+handle_call({set_read_concern, DbName, Collection, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:delete_by_query(Conn, DbName, Collection, Opts), State};
+handle_call({set_write_concern, DbName, Collection, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:set_write_concern(Conn, DbName, Collection, Opts), State};
+
+
+handle_call({create_collection, DbName, Collection, Opts}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:create_collection(Conn, DbName, Collection, Opts), State};
 handle_call({list_databases}, _From, #state{conn = Conn} = State) ->
   {reply, emongo_nif:list_databases(Conn), State};
 handle_call({list_collections, DbName}, _From, #state{conn = Conn} = State) ->
