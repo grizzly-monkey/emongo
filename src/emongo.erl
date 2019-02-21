@@ -24,6 +24,7 @@
 -module(emongo).
 
 -author('jeet@glabbr.com').
+%%-include_lib("eunit/include/eunit.hrl").
 
 %% API
 -export([start/1, add_tenant/2,
@@ -36,11 +37,15 @@
   find/2, find/3, find/4,
   exists/2, exists/3,
   count/3, count/4, count/5,
-  insert/2, insert/3, insert/4,
-  update_by_id/3, update_by_id/4, update_by_id/5,
-  update/3, update/4, update/5,
+  insert/2, insert/3, insert/4, %%Not Working
+  update_by_id/3, update_by_id/4, update_by_id/5,   %%not working
+  update/3, update/4, update/5, %%Not Working
   delete_by_id/2, delete_by_id/3, delete_by_id/4,
-  delete/2, delete/3, delete/4
+  delete/2, delete/3, delete/4,   %%not working
+  drop_db/1, drop_db/2,
+  drop_collection/2,drop_collection/3,
+  rename_collection/3,rename_collection/4,
+  run_command/2, run_command/3
 ]).
 
 -type emongo_code() :: error | ok.
@@ -50,7 +55,7 @@
 -define(DEFAULT_TENANT, default).
 -define(DEFAULT_NIF_REPLY_TIMEOUT, 60000 * 5). %% 5 minutes
 
--define(OPTS_WRITE_CONCERN, #{nodes => is_integer,
+-define(OPTS_WRITE_CONCERN, #{nodes => is_integer,  %% not found on mongo api doc
   journal => is_integer,
   timeout =>  is_integer,
   majority =>  is_integer,
@@ -89,11 +94,11 @@
   return_key  => is_boolean,
   no_cursor_timeout  => is_boolean,
   limit =>  is_integer,
-  max_staleness=> is_integer,
-  tags => is_list,
+  max_staleness=> is_integer, %% not found on mongo api doc
+  tags => is_list,  %% not found on mongo api doc
   max=> is_list,
   collation => is_list,
-  read_mode => is_atom
+  read_mode => is_atom  %% not found on mongo api doc
 }).
 
 -define(OPTS_COUNT, #{
@@ -102,9 +107,9 @@
   limit =>  is_integer,
   max_time =>  is_integer,
   skip =>  is_integer,
-  read_mode => is_atom,
-  tags => is_list,
-  max_staleness=> is_integer
+  read_mode => is_atom,  %% not found on mongo api doc
+  tags => is_list, %% not found on mongo api doc
+  max_staleness=> is_integer %% not found on mongo api doc
 }).
 
 -define(OPTS_INSERT, #{
@@ -410,6 +415,61 @@ create_collection(TenantName, DbName, Collection, Opts) ->
       W
   end.
 
+drop_db(DbName) ->
+  drop_db(?DEFAULT_TENANT, DbName).
+
+drop_db(TenantName, DbName) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {drop_db, DbName},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+drop_collection(DbName, Collection) ->
+  drop_collection(?DEFAULT_TENANT, DbName, Collection).
+
+drop_collection(TenantName, DbName, Collection) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {drop_collection, DbName, Collection},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+rename_collection(DbName, Collection, NewName) ->
+  rename_collection(?DEFAULT_TENANT, DbName, Collection, NewName).
+
+rename_collection(TenantName, DbName, Collection, NewName) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {rename_collection, DbName, Collection, NewName},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+run_command(DbName, Command) ->
+  run_command(?DEFAULT_TENANT, DbName, Command).
+
+run_command(TenantName, DbName, Command) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {run_command, DbName, Command},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 %%% internal
 validate(ValidateFor, Opts, ValidateAgainst) when is_map(Opts);

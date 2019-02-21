@@ -177,7 +177,7 @@ rename_collection(_Conn, _DbName, _Collection, _Opts) ->
   erlang:nif_error(nif_library_not_loaded).
 
 -spec run_command(port(), string(), string()) -> {ok, binary()}.
-run_command(_Conn, _DbName, _Collection) ->
+run_command(_Conn, _DbName, _Command) ->
   erlang:nif_error(nif_library_not_loaded).
 
 

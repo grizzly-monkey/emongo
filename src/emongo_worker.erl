@@ -123,8 +123,21 @@ handle_call({list_collections, DbName}, _From, #state{conn = Conn} = State) ->
 handle_call({collection_exists, DbName, Collection}, _From, #state{conn = Conn} = State) ->
   {reply, emongo_nif:collection_exists(Conn, DbName, Collection), State};
 
+handle_call({drop_db, DbName}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:drop_db(Conn, DbName), State};
+
+handle_call({drop_collection, DbName, Collection}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:drop_collection(Conn, DbName, Collection), State};
+
+handle_call({rename_collection, DbName, Collection, NewName}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:rename_collection(Conn, DbName, Collection, NewName), State};
+
+handle_call({run_command, DbName, Command}, _From, #state{conn = Conn} = State) ->
+  {reply, emongo_nif:run_command(Conn, DbName, Command), State};
+
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
+
 
 handle_cast(_Msg, State) ->
   {noreply, State}.

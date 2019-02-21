@@ -22,79 +22,140 @@
 #
 #----------------------------------------------------------------------
 
+INSTALL_LOC=$(pwd)
 DEPS_LOCATION=_build/deps
 
 if [ -d "$DEPS_LOCATION" ]; then
-    echo "cpp-driver fork already exist. delete $DEPS_LOCATION for a fresh checkout."
-    exit 0
+    rm -rf $DEPS_LOCATION
 fi
 
 OS=$(uname -s)
 KERNEL=$(echo $(lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 | awk '{print $1;}') | awk '{print $1;}')
+NUMBER_CORES=$(grep -c ^processor /proc/cpuinfo)
 
 echo $OS
 echo $KERNEL
 
-C_DRIVER_REPO=https://github.com/mongodb/mongo-c-driver/releases/download/1.13.0/mongo-c-driver-1.13.0.tar.gz
+C_DRIVER_REV=$1
+CPP_DRIVER_REV=$2
 
-CPP_DRIVER_REPO=https://github.com/mongodb/mongo-cxx-driver/archive/r3.4.0.zip
-CPP_DRIVER_REV=$1
+C_DRIVER_REPO=https://github.com/mongodb/mongo-c-driver/archive/$C_DRIVER_REV.zip
+#1.13.0
+CPP_DRIVER_REPO=https://github.com/mongodb/mongo-cxx-driver/archive/$CPP_DRIVER_REV.zip
+#r3.4.0
 
-case $OS in
-    Linux)
-        case $KERNEL in
-            CentOS)
+main()
+{
+	case $OS in
+    	Linux)
+        	case $KERNEL in
+            	CentOS)
+					make_centos
+                ;;
 
-                echo "Linux, CentOS"
-                sudo yum -y install automake cmake gcc-c++ git libtool openssl-devel wget zip
-            ;;
+            	Ubuntu)
+					make_ubuntu
+				;;
 
-            Ubuntu)
+            	*) 
+					echo "Your system $KERNEL is not supported"
+					exit 1
+        	esac
+			export CFLAGS=-fPIC
+			export CXXFLAGS=-fPIC
+    	;;
 
-                echo "Linux, Ubuntu"
-                # check ubuntu version
-                sudo apt-get -y update
-                sudo apt-get -y install g++ make cmake libssl-dev
-            ;;
+    	Darwin)
+        	make_darwin
+        	;;
 
-            *) echo "Your system $KERNEL is not supported"
-        esac
-		export CFLAGS=-fPIC
-		export CXXFLAGS=-fPIC
-    ;;
+    	*) 
+			echo "Your system $OS is not supported"
+			exit 1
+	esac
+	mkdir -p $DEPS_LOCATION
+	#makes new direcory inside current working directory
+	mongoc_download
+	mongoc_install
+	mongocxx_download
+	mongocxx_install
+}
 
-    Darwin)
-        brew install cmake openssl
-        export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
-        export OPENSSL_INCLUDE_DIR=$OPENSSL_ROOT_DIR/include/
-        export OPENSSL_LIBRARIES=$OPENSSL_ROOT_DIR/lib
-        ;;
+make_centos()
+{
+	echo "Linux, CentOS"
+	sudo yum -y install automake cmake gcc-c++ git libtool openssl-devel wget zip
+}
 
-    *) echo "Your system $OS is not supported"
-esac
+make_ubuntu()
+{
+	echo "Linux, Ubuntu"
+	# check ubuntu version
+	sudo apt-get -y update
+	sudo apt-get -y install g++ make cmake libssl-dev wget zip
+}
 
-mkdir -p $DEPS_LOCATION
+make_darwin()
+{
+	brew install cmake openssl
+	export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
+	export OPENSSL_INCLUDE_DIR=$OPENSSL_ROOT_DIR/include/
+	export OPENSSL_LIBRARIES=$OPENSSL_ROOT_DIR/lib
+}
 
-#download mongoc and mongocxx
+function fail_check
+{
+	#checks for error
+    "$@"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        echo "error with $1" >&2
+        exit 1
+    fi
+}
 
-pushd $DEPS_LOCATION
-wget  ${C_DRIVER_REPO}
-pushd c-driver
-wget  ${CPP_DRIVER_REPO}
-pushd cpp-driver
-popd
-popd
+mongoc_download()
+{
+	pushd $DEPS_LOCATION
+	
+	#download monoc zip file
+	fail_check wget  ${C_DRIVER_REPO}
+}
 
-#build
+mongoc_install()
+{
+	#install mongoc
 
-mkdir -p $DEPS_LOCATION/c-driver/cmake-build
-pushd $DEPS_LOCATION/c-driver/cmake-build
-cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
-make -j 12
-popd
+	unzip $C_DRIVER_REV.zip
 
-mkdir -p $DEPS_LOCATION/cpp-driver/cmake-build
-pushd $DEPS_LOCATION/cpp-driver/cmake-build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/lib
-make -j 12
-popd
+	pushd mongo-c-driver-$C_DRIVER_REV
+	fail_check cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_LOC/priv
+	fail_check make -j $NUMBER_CORES
+	fail_check make install
+	popd
+}
+
+mongocxx_download()
+{
+	
+	#download monocxx zip file
+	fail_check wget  ${CPP_DRIVER_REPO}
+	
+}
+
+mongocxx_install()
+{
+	#install mongocxx
+
+	unzip $CPP_DRIVER_REV.zip
+	pushd mongo-cxx-driver-$CPP_DRIVER_REV
+	
+	fail_check cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_LOC/priv
+	fail_check make -j $NUMBER_CORES
+	fail_check make install
+	popd
+}
+
+
+main
+
