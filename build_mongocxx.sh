@@ -26,7 +26,7 @@ INSTALL_LOC=$(pwd)
 DEPS_LOCATION=_build/deps
 
 if [ -d "$DEPS_LOCATION" ]; then
-    rm -rf $DEPS_LOCATION
+    rm -rf ${DEPS_LOCATION}
 fi
 
 OS=$(uname -s)
@@ -39,16 +39,16 @@ echo $KERNEL
 C_DRIVER_REV=$1
 CPP_DRIVER_REV=$2
 
-C_DRIVER_REPO=https://github.com/mongodb/mongo-c-driver/archive/$C_DRIVER_REV.zip
+C_DRIVER_REPO=https://github.com/mongodb/mongo-c-driver/archive/${C_DRIVER_REV}.zip
 #1.13.0
-CPP_DRIVER_REPO=https://github.com/mongodb/mongo-cxx-driver/archive/$CPP_DRIVER_REV.zip
+CPP_DRIVER_REPO=https://github.com/mongodb/mongo-cxx-driver/archive/${CPP_DRIVER_REV}.zip
 #r3.4.0
 
 main()
 {
-	case $OS in
+	case ${OS} in
     	Linux)
-        	case $KERNEL in
+        	case ${KERNEL} in
             	CentOS)
 					make_centos
                 ;;
@@ -73,7 +73,7 @@ main()
 			echo "Your system $OS is not supported"
 			exit 1
 	esac
-	mkdir -p $DEPS_LOCATION
+	mkdir -p ${DEPS_LOCATION}
 	#makes new direcory inside current working directory
 	mongoc_download
 	mongoc_install
@@ -99,8 +99,8 @@ make_darwin()
 {
 	brew install cmake openssl
 	export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
-	export OPENSSL_INCLUDE_DIR=$OPENSSL_ROOT_DIR/include/
-	export OPENSSL_LIBRARIES=$OPENSSL_ROOT_DIR/lib
+	export OPENSSL_INCLUDE_DIR=${OPENSSL_ROOT_DIR}/include/
+	export OPENSSL_LIBRARIES=${OPENSSL_ROOT_DIR}/lib
 }
 
 function fail_check
@@ -116,7 +116,7 @@ function fail_check
 
 mongoc_download()
 {
-	pushd $DEPS_LOCATION
+	pushd ${DEPS_LOCATION}
 	
 	#download monoc zip file
 	fail_check wget  ${C_DRIVER_REPO}
@@ -128,9 +128,9 @@ mongoc_install()
 
 	unzip $C_DRIVER_REV.zip
 
-	pushd mongo-c-driver-$C_DRIVER_REV
-	fail_check cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_LOC/priv
-	fail_check make -j $NUMBER_CORES
+	pushd mongo-c-driver-${C_DRIVER_REV}
+	fail_check cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_INSTALL_PREFIX=${INSTALL_LOC}/priv
+	fail_check make -j ${NUMBER_CORES}
 	fail_check make install
 	popd
 }
@@ -147,11 +147,11 @@ mongocxx_install()
 {
 	#install mongocxx
 
-	unzip $CPP_DRIVER_REV.zip
-	pushd mongo-cxx-driver-$CPP_DRIVER_REV
+	unzip ${CPP_DRIVER_REV}.zip
+	pushd mongo-cxx-driver-${CPP_DRIVER_REV}
 	
-	fail_check cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL_LOC/priv
-	fail_check make -j $NUMBER_CORES
+	fail_check cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${INSTALL_LOC}/priv
+	fail_check make -j ${NUMBER_CORES}
 	fail_check make install
 	popd
 }

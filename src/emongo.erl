@@ -24,7 +24,6 @@
 -module(emongo).
 
 -author('jeet@glabbr.com').
-%%-include_lib("eunit/include/eunit.hrl").
 
 %% API
 -export([start/1, add_tenant/2,
@@ -37,11 +36,11 @@
   find/2, find/3, find/4,
   exists/2, exists/3,
   count/3, count/4, count/5,
-  insert/2, insert/3, insert/4, %%Not Working
-  update_by_id/3, update_by_id/4, update_by_id/5,   %%not working
-  update/3, update/4, update/5, %%Not Working
+  insert/2, insert/3, insert/4,
+  update_by_id/3, update_by_id/4, update_by_id/5,
+  update/3, update/4, update/5,
   delete_by_id/2, delete_by_id/3, delete_by_id/4,
-  delete/2, delete/3, delete/4,   %%not working
+  delete/2, delete/3, delete/4,
   drop_db/1, drop_db/2,
   drop_collection/2,drop_collection/3,
   rename_collection/3,rename_collection/4,
@@ -55,7 +54,7 @@
 -define(DEFAULT_TENANT, default).
 -define(DEFAULT_NIF_REPLY_TIMEOUT, 60000 * 5). %% 5 minutes
 
--define(OPTS_WRITE_CONCERN, #{nodes => is_integer,  %% not found on mongo api doc
+-define(OPTS_WRITE_CONCERN, #{nodes => is_integer,
   journal => is_integer,
   timeout =>  is_integer,
   majority =>  is_integer,
@@ -94,11 +93,11 @@
   return_key  => is_boolean,
   no_cursor_timeout  => is_boolean,
   limit =>  is_integer,
-  max_staleness=> is_integer, %% not found on mongo api doc
-  tags => is_list,  %% not found on mongo api doc
+  max_staleness=> is_integer,
+  tags => is_list,
   max=> is_list,
   collation => is_list,
-  read_mode => is_atom  %% not found on mongo api doc
+  read_mode => is_atom
 }).
 
 -define(OPTS_COUNT, #{
@@ -107,9 +106,9 @@
   limit =>  is_integer,
   max_time =>  is_integer,
   skip =>  is_integer,
-  read_mode => is_atom,  %% not found on mongo api doc
-  tags => is_list, %% not found on mongo api doc
-  max_staleness=> is_integer %% not found on mongo api doc
+  read_mode => is_atom,
+  tags => is_list,
+  max_staleness=> is_integer
 }).
 
 -define(OPTS_INSERT, #{
