@@ -40,7 +40,11 @@
   update_by_id/3, update_by_id/4, update_by_id/5,
   update/3, update/4, update/5,
   delete_by_id/2, delete_by_id/3, delete_by_id/4,
-  delete/2, delete/3, delete/4
+  delete/2, delete/3, delete/4,
+  drop_db/1, drop_db/2,
+  drop_collection/2,drop_collection/3,
+  rename_collection/3,rename_collection/4,
+  run_command/2, run_command/3
 ]).
 
 -type emongo_code() :: error | ok.
@@ -410,6 +414,61 @@ create_collection(TenantName, DbName, Collection, Opts) ->
       W
   end.
 
+drop_db(DbName) ->
+  drop_db(?DEFAULT_TENANT, DbName).
+
+drop_db(TenantName, DbName) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {drop_db, DbName},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+drop_collection(DbName, Collection) ->
+  drop_collection(?DEFAULT_TENANT, DbName, Collection).
+
+drop_collection(TenantName, DbName, Collection) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {drop_collection, DbName, Collection},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+rename_collection(DbName, Collection, NewName) ->
+  rename_collection(?DEFAULT_TENANT, DbName, Collection, NewName).
+
+rename_collection(TenantName, DbName, Collection, NewName) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {rename_collection, DbName, Collection, NewName},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
+
+run_command(DbName, Command) ->
+  run_command(?DEFAULT_TENANT, DbName, Command).
+
+run_command(TenantName, DbName, Command) ->
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {run_command, DbName, Command},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 %%% internal
 validate(ValidateFor, Opts, ValidateAgainst) when is_map(Opts);
