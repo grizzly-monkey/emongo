@@ -182,10 +182,15 @@ find_all(Collection, Opts) when is_map(Opts) ->
   find_all(?DEFAULT_TENANT, Collection, Opts);
 
 find_all(TenantName, Collection) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {find_all, Collection},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {find_all, Collection},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+     _ : W  ->
+       W
+  end.
 
 -spec find_all(string(), string(), map()) -> emongo_response().
 find_all(TenantName, Collection, Opts) ->
@@ -204,10 +209,15 @@ find_by_id(Collection, Id) ->
   find_by_id(?DEFAULT_TENANT, Collection, Id).
 
 find_by_id(TenantName, Collection, Id) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {find_by_id, Collection, Id},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {find_by_id, Collection, Id},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+      _ : W ->
+        W
+  end.
 
 find(Collection, Filter) ->
   find(?DEFAULT_TENANT, Collection, Filter).
@@ -216,10 +226,15 @@ find(Collection, Filter, Opts) when is_map(Opts) ->
   find(?DEFAULT_TENANT, Collection, Filter, Opts);
 
 find(TenantName, Collection, Filter) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {find, Collection, Filter},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {find, Collection, Filter},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 find(TenantName, Collection, Filter, Opts) ->
   try
@@ -237,10 +252,15 @@ exists(Collection, Filter) ->
   exists(?DEFAULT_TENANT, Collection, Filter).
 
 exists(TenantName, Collection, Filter) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {exists, Collection, Filter},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {exists, Collection, Filter},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 count(DbName, Collection, Filter) ->
   count(?DEFAULT_TENANT, DbName, Collection, Filter).
@@ -249,10 +269,15 @@ count(DbName, Collection, Filter, Opts) when is_map(Opts) ->
   count(?DEFAULT_TENANT, DbName, Collection, Filter, Opts);
 
 count(TenantName, DbName, Collection, Filter) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {count, DbName, Collection, Filter},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {count, DbName, Collection, Filter},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 count(TenantName, DbName, Collection, Filter, Opts) ->
   try
@@ -273,10 +298,15 @@ insert(Collection, JsonData, Opts) when is_map(Opts) ->
   insert(?DEFAULT_TENANT, Collection, JsonData, Opts);
 
 insert(TenantName, Collection, JsonData) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {insert, Collection, length(JsonData), JsonData},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {insert, Collection, length(JsonData), JsonData},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 insert(TenantName, Collection, JsonData, Opts) ->
   try
@@ -297,10 +327,15 @@ update_by_id(Collection, Id, JsonData, Opts) when is_map(Opts) ->
   update_by_id(?DEFAULT_TENANT, Collection, Id, JsonData, Opts);
 
 update_by_id(TenantName, Collection, Id, JsonData) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {update_by_id, Collection, Id, length(JsonData), JsonData},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {update_by_id, Collection, Id, length(JsonData), JsonData},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W ->
+      W
+  end.
 
 update_by_id(TenantName, Collection, Id, JsonData, Opts) ->
   try
@@ -321,10 +356,15 @@ update(Collection, Filter, JsonData, Opts) when is_map(Opts) ->
   update(?DEFAULT_TENANT, Collection, Filter, JsonData, Opts);
 
 update(TenantName, Collection, Filter, JsonData) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {update_by_query, Collection, length(Filter), Filter, length(JsonData), JsonData},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {update_by_query, Collection, length(Filter), Filter, length(JsonData), JsonData},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W  ->
+      W
+  end.
 
 update(TenantName, Collection, Filter, JsonData, Opts) ->
   try
@@ -345,10 +385,15 @@ delete_by_id(Collection, Id, Opts) when is_map(Opts) ->
   delete_by_id(?DEFAULT_TENANT, Collection, Id, Opts);
 
 delete_by_id(TenantName, Collection, Id) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {delete_by_id, Collection, Id},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {delete_by_id, Collection, Id},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W  ->
+      W
+  end.
 
 delete_by_id(TenantName, Collection, Id, Opts) ->
   try
@@ -369,10 +414,15 @@ delete(Collection, Filter, Opts) when is_map(Opts) ->
   delete(?DEFAULT_TENANT, Collection, Filter, Opts);
 
 delete(TenantName, Collection, Filter) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {delete_by_query, Collection, length(Filter), Filter},
-      ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {delete_by_query, Collection, length(Filter), Filter},
+        ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W  ->
+      W
+  end.
 
 delete(TenantName, Collection, Filter, Opts) ->
   try
@@ -393,9 +443,14 @@ list_collections(DbName) ->
 
 -spec list_collections(string(), string()) -> emongo_response().
 list_collections(TenantName, DbName) ->
-  poolboy:transaction(TenantName, fun(Worker) ->
-    gen_server:call(Worker, {list_collections, DbName}, ?DEFAULT_NIF_REPLY_TIMEOUT)
-                                  end).
+  try
+    poolboy:transaction(TenantName, fun(Worker) ->
+      gen_server:call(Worker, {list_collections, DbName}, ?DEFAULT_NIF_REPLY_TIMEOUT)
+                                    end)
+  catch
+    _ : W  ->
+      W
+  end.
 
 -spec create_collection(string(), string(), map()) -> emongo_response().
 create_collection(DbName, Collection, Opts) ->
