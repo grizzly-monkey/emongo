@@ -188,8 +188,9 @@ find_all(TenantName, Collection) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-     _ : W  ->
-       W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 -spec find_all(string(), string(), map()) -> emongo_response().
@@ -201,8 +202,9 @@ find_all(TenantName, Collection, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw : {error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 find_by_id(Collection, Id) ->
@@ -215,8 +217,9 @@ find_by_id(TenantName, Collection, Id) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-      _ : W ->
-        W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 find(Collection, Filter) ->
@@ -232,8 +235,9 @@ find(TenantName, Collection, Filter) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 find(TenantName, Collection, Filter, Opts) ->
@@ -244,8 +248,9 @@ find(TenantName, Collection, Filter, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 exists(Collection, Filter) ->
@@ -258,8 +263,9 @@ exists(TenantName, Collection, Filter) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 count(DbName, Collection, Filter) ->
@@ -275,8 +281,9 @@ count(TenantName, DbName, Collection, Filter) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 count(TenantName, DbName, Collection, Filter, Opts) ->
@@ -287,8 +294,9 @@ count(TenantName, DbName, Collection, Filter, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw : {error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 insert(Collection, JsonData) ->
@@ -304,8 +312,9 @@ insert(TenantName, Collection, JsonData) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 insert(TenantName, Collection, JsonData, Opts) ->
@@ -316,8 +325,9 @@ insert(TenantName, Collection, JsonData, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 update_by_id(Collection, Id, JsonData) ->
@@ -333,8 +343,9 @@ update_by_id(TenantName, Collection, Id, JsonData) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 update_by_id(TenantName, Collection, Id, JsonData, Opts) ->
@@ -345,8 +356,9 @@ update_by_id(TenantName, Collection, Id, JsonData, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 update(Collection, Filter, JsonData) ->
@@ -362,8 +374,9 @@ update(TenantName, Collection, Filter, JsonData) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W  ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 update(TenantName, Collection, Filter, JsonData, Opts) ->
@@ -374,8 +387,9 @@ update(TenantName, Collection, Filter, JsonData, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 delete_by_id(Collection, Id) ->
@@ -391,8 +405,9 @@ delete_by_id(TenantName, Collection, Id) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W  ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 delete_by_id(TenantName, Collection, Id, Opts) ->
@@ -403,8 +418,9 @@ delete_by_id(TenantName, Collection, Id, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 delete(Collection, Filter) ->
@@ -420,8 +436,9 @@ delete(TenantName, Collection, Filter) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W  ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 delete(TenantName, Collection, Filter, Opts) ->
@@ -432,8 +449,9 @@ delete(TenantName, Collection, Filter, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 
@@ -448,8 +466,9 @@ list_collections(TenantName, DbName) ->
       gen_server:call(Worker, {list_collections, DbName}, ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W  ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 -spec create_collection(string(), string(), map()) -> emongo_response().
@@ -465,8 +484,9 @@ create_collection(TenantName, DbName, Collection, Opts) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    throw : {error, Reason}  ->
+      io:fwrite("Exception: Reason ==> throw :{error, ~p}~n",[Reason]),
+      {error, Reason}
   end.
 
 drop_db(DbName) ->
@@ -479,8 +499,9 @@ drop_db(TenantName, DbName) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 drop_collection(DbName, Collection) ->
@@ -493,8 +514,9 @@ drop_collection(TenantName, DbName, Collection) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 rename_collection(DbName, Collection, NewName) ->
@@ -507,8 +529,9 @@ rename_collection(TenantName, DbName, Collection, NewName) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 run_command(DbName, Command) ->
@@ -521,8 +544,9 @@ run_command(TenantName, DbName, Command) ->
         ?DEFAULT_NIF_REPLY_TIMEOUT)
                                     end)
   catch
-    _ : W ->
-      W
+    exit : {noproc, Reason}  ->
+      io:fwrite("Exception: Reason ==> exit : {noproc, ~p}~n",[Reason]),
+      {noproc, Reason}
   end.
 
 %%% internal
