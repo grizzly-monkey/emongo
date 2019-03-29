@@ -68,7 +68,7 @@ char *get_json(ErlNifEnv *env, ERL_NIF_TERM len, ERL_NIF_TERM argv) {
         throw std::system_error(std::error_code(EINVAL, std::generic_category()),
                                 "Invalid length");
     }
-
+    json_data_len = json_data_len + 1;
     char *json_doc = (char *) malloc((size_t) json_data_len);
 
     if (!enif_get_string(env, argv, json_doc, json_data_len,
