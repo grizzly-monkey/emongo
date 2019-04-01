@@ -157,7 +157,8 @@ mongo_response mongo_api::find_by_id(mongo_connection *connection, const std::st
         auto db = client->database(connection->get_db());
         mongocxx::stdx::optional<bsoncxx::document::value> maybe_result;
         try {
-            maybe_result = db[collection].find_one(document{} << "_id" << bsoncxx::oid(id) << finalize, find_opts);
+            auto bson_id = bsoncxx::oid(id);
+            maybe_result = db[collection].find_one(document{} << "_id" << bson_id << finalize, find_opts);
         } catch (bsoncxx::exception& e) {
             maybe_result = db[collection].find_one(document{} << "_id" << id << finalize, find_opts);
         }
@@ -253,8 +254,9 @@ mongo_response mongo_api::update_by_id(mongo_connection *connection, const std::
 
         mongocxx::stdx::optional<mongocxx::result::update> result;
         try {
+            auto bson_id = bsoncxx::oid(id);
             result = db[collection].update_one(
-                    document{} << "_id" << bsoncxx::oid(id) << finalize,
+                    document{} << "_id" << bson_id << finalize,
                     bsoncxx::from_json(json_data), update_opts);
         } catch (bsoncxx::exception& e) {
             result = db[collection].update_one(
@@ -303,8 +305,9 @@ mongo_response mongo_api::delete_by_id(mongo_connection *connection, const std::
 
         mongocxx::stdx::optional<mongocxx::result::delete_result> result;
         try {
+            auto bson_id = bsoncxx::oid(id);
             result = db[collection].delete_one(
-                    document{} << "_id" << bsoncxx::oid(id) << finalize, delete_options);
+                    document{} << "_id" << bson_id << finalize, delete_options);
         } catch (bsoncxx::exception& e) {
             result = db[collection].delete_one(
                     document{} << "_id" << id << finalize, delete_options);
