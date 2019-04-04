@@ -7,32 +7,36 @@
 #include "mongocxx/exception/write_exception.hpp"
 #include "bsoncxx/exception/exception.hpp"
 
-#define  MONGOCATCH(function, line)     catch(mongocxx::query_exception er)\
+#define  MONGOCATCH(function, line)     catch(mongocxx::query_exception& er)\
     {\
         return mongo_response{true , er.what()};\
     }\
-    catch(mongocxx::bulk_write_exception er)\
+    catch(mongocxx::bulk_write_exception& er)\
     {\
         return mongo_response{true , er.what()};\
     }\
-    catch(mongocxx::logic_error er)\
+    catch(mongocxx::logic_error& er)\
     {\
         return mongo_response{true , er.what()};\
     }\
-    catch(mongocxx::write_exception er)\
+    catch(mongocxx::write_exception& er)\
     {\
         return mongo_response{true , er.what()};\
     }\
-    catch(mongocxx::operation_exception er)\
+    catch(mongocxx::operation_exception& er)\
     {\
        return mongo_response{true , er.what()};\
     }\
-    catch(mongocxx::exception er)\
+    catch(mongocxx::exception& er)\
+    {\
+        return mongo_response{true , er.what()};\
+    }\
+    catch(bsoncxx::exception& er)\
     {\
         return mongo_response{true , er.what()};\
     }\
     catch (...)\
     {\
-       return mongo_response{true ," Unknown Exception"};\
+       return mongo_response{true, "Unknown Exception"};\
     }\
 

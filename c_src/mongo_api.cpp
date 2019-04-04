@@ -155,10 +155,13 @@ mongo_response mongo_api::find_by_id(mongo_connection *connection, const std::st
     try {
         auto client = connection->get_connection_pool()->acquire();
         auto db = client->database(connection->get_db());
-
-        mongocxx::stdx::optional<bsoncxx::document::value> maybe_result =
-                db[collection].find_one(document{} << "_id" << bsoncxx::oid(id) << finalize, find_opts);
-
+        mongocxx::stdx::optional<bsoncxx::document::value> maybe_result;
+        try {
+            auto bson_id = bsoncxx::oid(id);
+            maybe_result = db[collection].find_one(document{} << "_id" << bson_id << finalize, find_opts);
+        } catch (bsoncxx::exception& e) {
+            maybe_result = db[collection].find_one(document{} << "_id" << id << finalize, find_opts);
+        }
         if (maybe_result) {
             auto view = maybe_result->view();
             std::string result = bsoncxx::to_json(view);
@@ -249,9 +252,17 @@ mongo_response mongo_api::update_by_id(mongo_connection *connection, const std::
         auto client = connection->get_connection_pool()->acquire();
         auto db = client->database(connection->get_db());
 
-        mongocxx::stdx::optional<mongocxx::result::update> result = db[collection].update_one(
-                document{} << "_id" << bsoncxx::oid(id) << finalize,
-                bsoncxx::from_json(json_data), update_opts);
+        mongocxx::stdx::optional<mongocxx::result::update> result;
+        try {
+            auto bson_id = bsoncxx::oid(id);
+            result = db[collection].update_one(
+                    document{} << "_id" << bson_id << finalize,
+                    bsoncxx::from_json(json_data), update_opts);
+        } catch (bsoncxx::exception& e) {
+            result = db[collection].update_one(
+                    document{} << "_id" << id << finalize,
+                    bsoncxx::from_json(json_data), update_opts);
+        }
 
         std::string matched_count = std::to_string(result->matched_count());
         std::string modified_count = std::to_string(result->modified_count());
@@ -292,8 +303,15 @@ mongo_response mongo_api::delete_by_id(mongo_connection *connection, const std::
         auto db = client->database(connection->get_db());
 
 
-        mongocxx::stdx::optional<mongocxx::result::delete_result> result = db[collection].delete_one(
-                document{} << "_id" << bsoncxx::oid(id) << finalize, delete_options);
+        mongocxx::stdx::optional<mongocxx::result::delete_result> result;
+        try {
+            auto bson_id = bsoncxx::oid(id);
+            result = db[collection].delete_one(
+                    document{} << "_id" << bson_id << finalize, delete_options);
+        } catch (bsoncxx::exception& e) {
+            result = db[collection].delete_one(
+                    document{} << "_id" << id << finalize, delete_options);
+        }
 
         std::string deleted_count = std::to_string(result->deleted_count());
 

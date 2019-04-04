@@ -24,6 +24,7 @@
 -module(emongo).
 
 -author('jeet@glabbr.com').
+-include_lib("eunit/include/eunit.hrl").
 
 %% API
 -export([start/1, add_tenant/2,
@@ -42,8 +43,8 @@
   delete_by_id/2, delete_by_id/3, delete_by_id/4,
   delete/2, delete/3, delete/4,
   drop_db/1, drop_db/2,
-  drop_collection/2,drop_collection/3,
-  rename_collection/3,rename_collection/4,
+  drop_collection/2, drop_collection/3,
+  rename_collection/3, rename_collection/4,
   run_command/2, run_command/3
 ]).
 
@@ -130,11 +131,11 @@
 %%% API functions
 %%%===================================================================
 -spec start(string()) -> emongo_response().
-start(Uri)->
-  emongo_app:start([],[{uri, Uri}, {tenant_id,?DEFAULT_TENANT}]).
+start(Uri) ->
+  emongo_app:start([], [{uri, Uri}, {tenant_id, ?DEFAULT_TENANT}]).
 
 
--spec add_tenant(string(), string()) -> emongo_response().
+-spec add_tenant(term(), string()) -> emongo_response().
 add_tenant(TenantId, Uri) ->
   emongo_sup:start_child(TenantId, Uri).
 
